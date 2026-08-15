@@ -5,39 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulasi FSA - Pemilah Sampah Otomatis</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              bg: '#fff9eb',
-              sage: '#9fb2ac',
-              maroon: '#5d0d18'
-            }
-          }
-        }
-      }
-    }
-  </script>
   <style>
     .state-active {
       fill: #9fb2ac !important;
       stroke: #5d0d18 !important;
       stroke-width: 3px !important;
-      filter: drop-shadow(0 0 6px rgba(159, 178, 172, 0.8));
+      filter: drop-shadow(0 0 8px rgba(159, 178, 172, 0.9));
     }
     .state-final-active {
       fill: #15803d !important;
       stroke: #5d0d18 !important;
       stroke-width: 3px !important;
-      filter: drop-shadow(0 0 6px rgba(21, 128, 61, 0.8));
+      filter: drop-shadow(0 0 8px rgba(21, 128, 61, 0.9));
     }
     .state-error-active {
       fill: #b91c1c !important;
       stroke: #5d0d18 !important;
       stroke-width: 3px !important;
-      filter: drop-shadow(0 0 6px rgba(185, 28, 28, 0.8));
+      filter: drop-shadow(0 0 8px rgba(185, 28, 28, 0.9));
     }
   </style>
 </head>
@@ -47,7 +32,7 @@
   <header class="border-b border-[#9fb2ac] bg-[#fff9eb]/90 backdrop-blur px-6 py-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div>
-        <h1 class="text-xl font-bold text-[#5d0d18]">WasteAutomata</h1>
+        <h1 class="text-xl font-bold text-[#5d0d18]">WasteAutomata v1.0 (Flask Engine)</h1>
         <p class="text-xs text-[#5d0d18]/80">Simulasi Pemroses Sampah Otomatis Berbasis Finite State Automata (DFA)</p>
       </div>
       <span class="bg-[#9fb2ac]/30 text-[#5d0d18] border border-[#9fb2ac] text-xs px-3 py-1 rounded-full font-mono font-semibold">
@@ -58,60 +43,51 @@
 
   <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Panel Kontrol & Input (Kiri) -->
+    <!-- Panel Kontrol -->
     <section class="lg:col-span-1 bg-white/70 border border-[#9fb2ac] rounded-xl p-5 flex flex-col gap-5 shadow-sm">
       <h2 class="text-lg font-semibold text-[#5d0d18] border-b border-[#9fb2ac] pb-2">Kontrol Input Sensor</h2>
       
-      <!-- Tombol Aksi Kustom -->
+      <!-- Uji Sequence -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-semibold text-[#5d0d18]/80">Simulasi Input Langsung:</label>
-        <button onclick="sendInput('item')" class="bg-[#9fb2ac]/40 hover:bg-[#9fb2ac]/60 text-[#5d0d18] font-medium py-2 px-4 rounded-lg text-sm text-left transition border border-[#9fb2ac]">
-          1. <code>item</code> - Deteksi Benda Masuk
-        </button>
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="sendInput('o')" class="bg-[#9fb2ac] hover:opacity-90 text-[#5d0d18] font-bold py-2 px-2 rounded-lg text-xs text-center transition">
-            <code>o</code> Organik
-          </button>
-          <button onclick="sendInput('a')" class="bg-[#9fb2ac] hover:opacity-90 text-[#5d0d18] font-bold py-2 px-2 rounded-lg text-xs text-center transition">
-            <code>a</code> Anorganik
-          </button>
-          <button onclick="sendInput('m')" class="bg-[#9fb2ac] hover:opacity-90 text-[#5d0d18] font-bold py-2 px-2 rounded-lg text-xs text-center transition">
-            <code>m</code> Logam
-          </button>
-        </div>
-        <button onclick="sendInput('x')" class="bg-[#5d0d18] hover:bg-[#5d0d18]/90 text-[#fff9eb] font-medium py-2 px-4 rounded-lg text-xs text-left transition">
-          <code>x</code> Material Error / Anomali
-        </button>
-        <button onclick="sendInput('c')" class="bg-[#9fb2ac]/60 hover:bg-[#9fb2ac] text-[#5d0d18] font-semibold py-2 px-4 rounded-lg text-xs text-left transition border border-[#9fb2ac]">
-          <code>c</code> Clear / Proses Selesai
-        </button>
-      </div>
-
-      <!-- Eksekusi String Sekaligus -->
-      <div class="border-t border-[#9fb2ac] pt-4 flex flex-col gap-2">
-        <label for="stringInput" class="text-xs font-semibold text-[#5d0d18]/80">Uji Sequence Input (Pisah Koma):</label>
+        <label for="stringInput" class="text-xs font-semibold text-[#5d0d18]/80">Masukkan Sequence Input (Pisah Koma):</label>
         <div class="flex gap-2">
-          <input type="text" id="stringInput" placeholder="Contoh: item,o,c" class="bg-[#fff9eb] border border-[#9fb2ac] text-[#5d0d18] rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-[#5d0d18]">
-          <button onclick="runSequence()" class="bg-[#5d0d18] hover:bg-[#5d0d18]/90 text-[#fff9eb] text-xs px-4 rounded-lg font-medium transition">Jalankan</button>
+          <input type="text" id="stringInput" placeholder="Contoh: item, o, c" value="item, o, c" class="bg-[#fff9eb] border border-[#9fb2ac] text-[#5d0d18] rounded-lg px-3 py-2 text-sm w-full focus:outline-none font-mono">
+          <button id="btnRunSequence" class="bg-[#5d0d18] hover:bg-[#5d0d18]/90 text-[#fff9eb] text-xs px-4 rounded-lg font-medium transition">Jalankan</button>
         </div>
       </div>
 
-      <!-- Reset Button -->
-      <button onclick="resetFSA()" class="bg-[#fff9eb] hover:bg-white text-[#5d0d18] border border-[#5d0d18] text-xs font-bold py-2 rounded-lg mt-auto transition">
-        Reset Mesin (Kembali ke q0)
+      <!-- Presets Tombol Cepat -->
+      <div class="flex flex-col gap-2 border-t border-[#9fb2ac] pt-4">
+        <label class="text-xs font-semibold text-[#5d0d18]/80">Uji Preset Skenario Cepat:</label>
+        <button onclick="setAndRun('item, o, c')" class="bg-[#9fb2ac]/40 hover:bg-[#9fb2ac]/60 text-[#5d0d18] font-semibold py-2 px-3 rounded-lg text-xs text-left transition border border-[#9fb2ac]">
+          🌱 Organik: <code>item, o, c</code>
+        </button>
+        <button onclick="setAndRun('item, a, c')" class="bg-[#9fb2ac]/40 hover:bg-[#9fb2ac]/60 text-[#5d0d18] font-semibold py-2 px-3 rounded-lg text-xs text-left transition border border-[#9fb2ac]">
+          📦 Anorganik: <code>item, a, c</code>
+        </button>
+        <button onclick="setAndRun('item, m, c')" class="bg-[#9fb2ac]/40 hover:bg-[#9fb2ac]/60 text-[#5d0d18] font-semibold py-2 px-3 rounded-lg text-xs text-left transition border border-[#9fb2ac]">
+          ⚙️ Logam: <code>item, m, c</code>
+        </button>
+        <button onclick="setAndRun('item, x')" class="bg-[#5d0d18] hover:bg-[#5d0d18]/90 text-[#fff9eb] font-semibold py-2 px-3 rounded-lg text-xs text-left transition">
+          ❌ Anomali/Error: <code>item, x</code>
+        </button>
+      </div>
+
+      <button id="btnReset" class="bg-[#fff9eb] hover:bg-white text-[#5d0d18] border border-[#5d0d18] text-xs font-bold py-2 rounded-lg mt-auto transition">
+        Reset Mesin (q0)
       </button>
     </section>
 
-    <!-- Visualizer Diagram State (Tengah/Kanan) -->
+    <!-- Visualizer & Console -->
     <section class="lg:col-span-2 bg-white/70 border border-[#9fb2ac] rounded-xl p-5 flex flex-col gap-4 shadow-sm">
       <div class="flex justify-between items-center border-b border-[#9fb2ac] pb-2">
-        <h2 class="text-lg font-semibold text-[#5d0d18]">Diagram Transisi FSA</h2>
-        <div id="statusBadge" class="bg-[#9fb2ac]/30 border border-[#9fb2ac] text-[#5d0d18] text-xs font-mono px-3 py-1 rounded-full">
-          State Aktif: <span id="currentStateText" class="font-bold text-[#5d0d18]">q0</span>
+        <h2 class="text-lg font-semibold text-[#5d0d18]">Diagram Transisi DFA</h2>
+        <div class="bg-[#9fb2ac]/30 border border-[#9fb2ac] text-[#5d0d18] text-xs font-mono px-3 py-1 rounded-full">
+          State Aktif: <span id="currentStateText" class="font-bold text-[#5d0d18]">q0 (Standby)</span>
         </div>
       </div>
 
-      <!-- Canvas SVG Diagram -->
+      <!-- SVG Diagram -->
       <div class="bg-[#fff9eb] border border-[#9fb2ac] rounded-lg p-4 flex justify-center items-center overflow-x-auto">
         <svg width="600" height="280" viewBox="0 0 600 280" class="w-full h-auto">
           <defs>
@@ -120,7 +96,6 @@
             </marker>
           </defs>
 
-          <!-- Transisi Line / Arrows -->
           <path d="M 70 140 L 140 140" stroke="#5d0d18" stroke-width="2" marker-end="url(#arrow)" />
           <path d="M 190 120 L 260 60" stroke="#5d0d18" stroke-width="2" marker-end="url(#arrow)" />
           <path d="M 200 140 L 260 140" stroke="#5d0d18" stroke-width="2" marker-end="url(#arrow)" />
@@ -131,7 +106,6 @@
           <path d="M 320 140 L 480 140" stroke="#5d0d18" stroke-width="2" marker-end="url(#arrow)" />
           <path d="M 320 220 L 490 160" stroke="#5d0d18" stroke-width="2" marker-end="url(#arrow)" />
 
-          <!-- Text Labels on Arrows -->
           <text x="95" y="130" fill="#5d0d18" font-size="11" font-weight="bold">item</text>
           <text x="210" y="80" fill="#5d0d18" font-size="11" font-weight="bold">o</text>
           <text x="225" y="130" fill="#5d0d18" font-size="11" font-weight="bold">a</text>
@@ -141,7 +115,6 @@
           <text x="400" y="130" fill="#5d0d18" font-size="11" font-weight="bold">c</text>
           <text x="400" y="200" fill="#5d0d18" font-size="11" font-weight="bold">c</text>
 
-          <!-- Nodes / States -->
           <circle id="node-q0" cx="50" cy="140" r="22" fill="#fff9eb" stroke="#5d0d18" stroke-width="2" class="state-active"/>
           <text x="50" y="144" fill="#5d0d18" font-size="12" text-anchor="middle" font-weight="bold">q0</text>
 
@@ -166,16 +139,16 @@
         </svg>
       </div>
 
-      <!-- History Log -->
+      <!-- Console Log -->
       <div class="flex flex-col gap-2">
-        <h3 class="text-xs font-semibold text-[#5d0d18]">Log Eksekusi Real-time:</h3>
-        <div id="logConsole" class="bg-[#fff9eb] border border-[#9fb2ac] rounded-lg p-3 font-mono text-xs h-32 overflow-y-auto flex flex-col gap-1 text-[#5d0d18]">
-          <span class="text-[#5d0d18]/70">[System] Mesin dalam kondisi Standby (q0). Siap menerima input.</span>
+        <h3 class="text-xs font-semibold text-[#5d0d18]">Log Eksekusi Real-time (Server Response):</h3>
+        <div id="logConsole" class="bg-[#fff9eb] border border-[#9fb2ac] rounded-lg p-3 font-mono text-xs h-36 overflow-y-auto flex flex-col gap-1 text-[#5d0d18]">
+          <span class="text-[#5d0d18]/70">[System] Siap menerima input...</span>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
